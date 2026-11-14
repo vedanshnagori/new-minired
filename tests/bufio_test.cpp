@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace std;
+
 TEST(BufioReader, ReadBytesKeepsDelimiter) {
     StringReader src("hello\nworld\n");
     bufio::Reader reader(src);
@@ -39,8 +41,9 @@ TEST(BufioReader, ThrowsEOFWhenStreamEndsEarly) {
 }
 
 TEST(BufioReader, ThrowsWhenLineTooLong) {
-    StringReader src(std::string(100, 'x') + "\n");
+    StringReader src(string(100, 'x') + "\n");
     bufio::Reader reader(src, 16);
 
     EXPECT_THROW(reader.ReadBytes('\n'), bufio::BufferFullError);
 }
+

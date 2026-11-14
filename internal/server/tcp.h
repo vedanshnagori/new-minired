@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <string_view>
 
+using namespace std;
+
 // thin RAII wrappers over POSIX sockets, playing the role of Go's net.Listener / net.Conn
 namespace server {
 
@@ -20,10 +22,10 @@ public:
     Conn& operator=(const Conn&) = delete;
 
     // Read reads up to n bytes from the socket, 0 means the client hung up
-    std::size_t Read(char* p, std::size_t n) override;
+    size_t Read(char* p, size_t n) override;
 
     // Write sends all of data, looping over partial sends
-    void Write(std::string_view data);
+    void Write(string_view data);
 
     void Close();
 
@@ -50,6 +52,7 @@ private:
 };
 
 // Listen opens a TCP listener on all interfaces at the given port (like net.Listen("tcp", ":port"))
-Listener Listen(std::uint16_t port);
+Listener Listen(uint16_t port);
 
 } // namespace server
+

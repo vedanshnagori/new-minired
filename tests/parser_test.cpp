@@ -6,11 +6,13 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 namespace {
 
-using Args = std::vector<std::string>;
+using Args = vector<string>;
 
-Args parseOne(const std::string& input, std::size_t chunkSize = 4096) {
+Args parseOne(const string& input, size_t chunkSize = 4096) {
     StringReader src(input, chunkSize);
     bufio::Reader reader(src);
     resp::Parser parser(reader);
@@ -52,7 +54,7 @@ TEST(Parser, ParsesPipelinedCommands) {
 }
 
 TEST(Parser, RejectsMalformedInput) {
-    const std::vector<std::string> bad = {
+    const vector<string> bad = {
         "\r\n",                            // empty payload
         "PING\r\n",                        // not an array
         "*-1\r\n",                         // negative count (crashed the Go version)
@@ -63,7 +65,7 @@ TEST(Parser, RejectsMalformedInput) {
         "*1\r\n$999999999999\r\n",         // absurd bulk length
         "*1\r\n$4\r\nPINGxx",              // bulk data not followed by CRLF
     };
-    for (const std::string& input : bad) {
+    for (const string& input : bad) {
         EXPECT_THROW(parseOne(input), resp::ProtocolError) << "input: " << input;
     }
 }
@@ -72,3 +74,4 @@ TEST(Parser, ThrowsEOFOnTruncatedCommand) {
     EXPECT_THROW(parseOne("*2\r\n$3\r\nGET\r\n"), io::EOFError);
     EXPECT_THROW(parseOne("*1\r\n$5\r\nhel"), io::EOFError);
 }
+

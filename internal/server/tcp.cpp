@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+using namespace std;
+
 // macOS has no MSG_NOSIGNAL, it uses the SO_NOSIGPIPE socket option instead (set in Accept)
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
@@ -18,7 +20,7 @@ namespace server {
 namespace {
 
 [[noreturn]] void throwErrno(const char* what) {
-    throw std::system_error(errno, std::generic_category(), what);
+    throw system_error(errno, generic_category(), what);
 }
 
 } // namespace
@@ -29,21 +31,21 @@ Conn::~Conn() {
     Close();
 }
 
-Conn::Conn(Conn&& other) noexcept : fd(std::exchange(other.fd, -1)) {}
+Conn::Conn(Conn&& other) noexcept : fd(exchange(other.fd, -1)) {}
 
 Conn& Conn::operator=(Conn&& other) noexcept {
     if (this != &other) {
         Close();
-        fd = std::exchange(other.fd, -1);
+        fd = exchange(other.fd, -1);
     }
     return *this;
 }
 
-std::size_t Conn::Read(char* p, std::size_t n) {
+size_t Conn::Read(char* p, size_t n) {
     for (;;) {
         ssize_t got = recv(fd, p, n, 0);
         if (got >= 0) {
-            return static_cast<std::size_t>(got);
+            return static_cast<size_t>(got);
         }
         if (errno != EINTR) {
             throwErrno("recv");
@@ -51,7 +53,7 @@ std::size_t Conn::Read(char* p, std::size_t n) {
     }
 }
 
-void Conn::Write(std::string_view data) {
+void Conn::Write(string_view data) {
     while (!data.empty()) {
         // MSG_NOSIGNAL: writing to a closed client must return an error, not kill the whole process with SIGPIPE
         ssize_t sent = send(fd, data.data(), data.size(), MSG_NOSIGNAL);
@@ -61,7 +63,7 @@ void Conn::Write(std::string_view data) {
             }
             throwErrno("send");
         }
-        data.remove_prefix(static_cast<std::size_t>(sent));
+        data.remove_prefix(static_cast<size_t>(sent));
     }
 }
 
@@ -80,7 +82,7 @@ Listener::~Listener() {
     }
 }
 
-Listener::Listener(Listener&& other) noexcept : fd(std::exchange(other.fd, -1)) {}
+Listener::Listener(Listener&& other) noexcept : fd(exchange(other.fd, -1)) {}
 
 Conn Listener::Accept() {
     for (;;) {
@@ -98,7 +100,7 @@ Conn Listener::Accept() {
     }
 }
 
-Listener Listen(std::uint16_t port) {
+Listener Listen(uint16_t port) {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
         throwErrno("socket");
@@ -127,3 +129,4 @@ Listener Listen(std::uint16_t port) {
 }
 
 } // namespace server
+

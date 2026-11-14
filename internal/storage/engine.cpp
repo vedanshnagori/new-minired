@@ -2,28 +2,31 @@
 
 #include <mutex>
 
+using namespace std;
+
 namespace storage {
 
-void Engine::Set(const std::string& key, const std::string& value) {
-    std::unique_lock lock(mu); // write lock, released automatically when lock goes out of scope
+void Engine::Set(const string& key, const string& val) {
+    unique_lock lock(mu); // write lock, released automatically when lock goes out of scope
 
-    data[key] = value;
+    data[key] = val;
 }
 
-std::optional<std::string> Engine::Get(const std::string& key) const {
-    std::shared_lock lock(mu); // shared read lock
+optional<string> Engine::Get(const string& key) const {
+    shared_lock lock(mu); // shared read lock
 
     auto it = data.find(key);
     if (it == data.end()) {
-        return std::nullopt;
+        return nullopt;
     }
     return it->second;
 }
 
-bool Engine::Delete(const std::string& key) {
-    std::unique_lock lock(mu);
+bool Engine::Delete(const string& key) {
+    unique_lock lock(mu);
 
     return data.erase(key) > 0;
 }
 
 } // namespace storage
+

@@ -6,12 +6,14 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 namespace resp {
 
 // ProtocolError means the client sent bytes that aren't valid RESP
-class ProtocolError : public std::runtime_error {
+class ProtocolError : public runtime_error {
 public:
-    using std::runtime_error::runtime_error;
+    using runtime_error::runtime_error;
 };
 
 // wraps a bufio::Reader to decode incoming RESP data
@@ -24,12 +26,13 @@ public:
     explicit Parser(bufio::Reader& reader);
 
     // Parse extracts a full RESP array into a vector of strings
-    std::vector<std::string> Parse();
+    vector<string> Parse();
 
 private:
-    std::string readLine();
+    string readLine();
 
     bufio::Reader& reader;
 };
 
 } // namespace resp
+

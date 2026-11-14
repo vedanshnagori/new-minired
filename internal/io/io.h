@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <stdexcept>
 
+using namespace std;
+
 // C++ stand-ins for the bits of Go's "io" package that miniRedis relies on
 namespace io {
 
@@ -13,13 +15,14 @@ public:
 
     // Read reads up to n bytes into p and returns how many were read
     // returns 0 when the stream has ended (Go's io.EOF)
-    virtual std::size_t Read(char* p, std::size_t n) = 0;
+    virtual size_t Read(char* p, size_t n) = 0;
 };
 
 // EOFError is thrown when the stream ends before we got what we asked for
-class EOFError : public std::runtime_error {
+class EOFError : public runtime_error {
 public:
-    EOFError() : std::runtime_error("EOF") {}
+    EOFError() : runtime_error("EOF") {}
 };
 
 } // namespace io
+
